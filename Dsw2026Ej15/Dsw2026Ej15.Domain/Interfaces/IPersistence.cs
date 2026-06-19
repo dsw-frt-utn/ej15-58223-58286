@@ -8,6 +8,7 @@ public interface IPersistence
     Speciality? GetSpecialityById(Guid id);
     void SaveDoctor(Doctor doctor);
     IEnumerable<Doctor> GetDoctors();
+    Doctor GetDoctorById(Guid id);
 
     // Aquí luego agregaremos los métodos para insertar, buscar o eliminar médicos
 }

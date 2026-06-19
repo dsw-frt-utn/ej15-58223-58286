@@ -52,4 +52,10 @@ public class PersistenceInMemory : IPersistence
     {
         return _doctors.Where(d => d.IsActive == true);
     }
+
+    public Doctor GetDoctorById(Guid id)
+    {
+        return _doctors.SingleOrDefault(d => d._id == id && d.IsActive == true);
+    }
+
 }
