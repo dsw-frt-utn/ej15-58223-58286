@@ -1,4 +1,6 @@
-﻿using Dsw2026Ej15.Domain;
+﻿using Dsw2026Ej15.Domain.Interfaces;
+using Dsw2026Ej15.Domain.Entities;
+using Dsw2026Ej15.Data.Dtos;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -8,25 +10,46 @@ namespace Dsw2026Ej15.Data;
 
 public class PersistenceInMemory : IPersistence
 {
-    public List<Speciality> Specialities { get; private set; }
-    public List<Doctor> Doctors { get; private set; }
+    private List<Speciality> _specialities = [];
+    private List<Doctor> _doctors = [];
 
     public PersistenceInMemory()
     {
-   
-        Specialities = new List<Speciality>();
-        Doctors = new List<Doctor>();
-        LoadSpecialities().Wait();
+        LoadSpecialities();
     }
-    private async Task LoadSpecialities()
+
+    private void LoadSpecialities()
     {
-        if (File.Exists("specialities.json"))
+        try
         {
-            var json = await File.ReadAllTextAsync("specialities.json");
-            Specialities = JsonSerializer.Deserialize<List<Speciality>>(json, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true 
-            });
+            var jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Sources", "specialities.json");
+            var json = File.ReadAllText(jsonPath);
+            var specialities = JsonSerializer.Deserialize<List<SpecialityDto>>(json,
+                new JsonSerializerOptions()
+                {
+                    PropertyNameCaseInsensitive = true
+                }) ?? [];
+            _specialities = [.. specialities.Select(s => new Speciality(s.Name, s.Description, s.Id))];
         }
+        catch (Exception)
+        {
+
+        }
+    }
+
+    public Speciality? GetSpecialityById(Guid id)
+    {
+        return _specialities.SingleOrDefault(s => s._id == id);
+    }
+
+    public void SaveDoctor(Doctor doctor)
+    {
+        _doctors.Add(doctor);
+    }
+
+
+    public IEnumerable<Doctor> GetDoctors()
+    {
+        return _doctors.Where(d => d.IsActive == true);
     }
 }
