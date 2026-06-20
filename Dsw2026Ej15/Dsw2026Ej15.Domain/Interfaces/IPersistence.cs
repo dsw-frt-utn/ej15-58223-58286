@@ -9,6 +9,7 @@ public interface IPersistence
     void SaveDoctor(Doctor doctor);
     IEnumerable<Doctor> GetDoctors();
     Doctor GetDoctorById(Guid id);
+    void DeleteDoctor(Guid id);
 
     // Aquí luego agregaremos los métodos para insertar, buscar o eliminar médicos
 }

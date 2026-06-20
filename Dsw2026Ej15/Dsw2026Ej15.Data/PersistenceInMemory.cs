@@ -16,6 +16,7 @@ public class PersistenceInMemory : IPersistence
     public PersistenceInMemory()
     {
         LoadSpecialities();
+        LoadDoctors();
     }
 
     private void LoadSpecialities()
@@ -36,10 +37,32 @@ public class PersistenceInMemory : IPersistence
 
         }
     }
+    private void LoadDoctors()
+    {
+        try
+        {
+            var jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Sources", "doctors.json");
+            var json = File.ReadAllText(jsonPath);
+            var doctors = JsonSerializer.Deserialize<List<DoctorDto>>(json,
+                new JsonSerializerOptions()
+                {
+                    PropertyNameCaseInsensitive = true
+                }) ?? [];
+            foreach(var doc in doctors)
+            {
+                var speciality = _specialities.FirstOrDefault(s => s.Id == doc.SpecialityId);
+                SaveDoctor(new Doctor(doc.id, doc.Name, doc.LicenseNumber,doc.IsActive ,speciality));
+            }
+        }
+        catch (Exception)
+        {
+
+        }
+    }
 
     public Speciality? GetSpecialityById(Guid id)
     {
-        return _specialities.SingleOrDefault(s => s._id == id);
+        return _specialities.SingleOrDefault(s => s.Id == id);
     }
 
     public void SaveDoctor(Doctor doctor)
@@ -55,7 +78,13 @@ public class PersistenceInMemory : IPersistence
 
     public Doctor GetDoctorById(Guid id)
     {
-        return _doctors.SingleOrDefault(d => d._id == id && d.IsActive == true);
+        return _doctors.SingleOrDefault(d => d.Id == id);
+    }
+
+    public void DeleteDoctor(Guid id)
+    {
+        var doctor = GetDoctorById(id);
+        doctor.IsActive = false;
     }
 
 }

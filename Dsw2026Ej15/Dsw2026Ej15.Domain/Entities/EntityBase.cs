@@ -4,12 +4,12 @@ using System.Text;
 
 namespace Dsw2026Ej15.Domain.Entities
 {
-    public class EntityBase()
+    public class EntityBase
     {
-        public Guid? _id = Guid.NewGuid();
-        public EntityBase(Guid? id) :this()
+        public Guid? Id { get; private set; }
+        protected EntityBase(Guid? id = null) 
         {
-            _id = id;
+            Id = id ?? Guid.NewGuid();
         }
     }
 }

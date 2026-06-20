@@ -1,4 +1,7 @@
 
+using Dsw2026Ej15.Data;
+using Dsw2026Ej15.Domain.Interfaces;
+
 namespace Dsw2026Ej15.Api
 {
     public class Program
@@ -11,6 +14,9 @@ namespace Dsw2026Ej15.Api
 
             builder.Services.AddControllers();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddSingleton<IPersistence, PersistenceInMemory>();
+            builder.Services.AddHealthChecks();
+
 
             var app = builder.Build();
 
@@ -27,6 +33,7 @@ namespace Dsw2026Ej15.Api
 
 
             app.MapControllers();
+            app.MapHealthChecks("health-check");
 
             app.Run();
         }
