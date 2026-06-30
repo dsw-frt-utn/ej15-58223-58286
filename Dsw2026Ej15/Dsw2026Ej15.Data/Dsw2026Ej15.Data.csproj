@@ -7,11 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Dsw2026Ej15.Domain\Dsw2026Ej15.Domain.csproj" />
+    <Compile Remove="Sources\**" />
+    <EmbeddedResource Remove="Sources\**" />
+    <None Remove="Sources\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Sources\" />
+    <ProjectReference Include="..\Dsw2026Ej15.Domain\Dsw2026Ej15.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

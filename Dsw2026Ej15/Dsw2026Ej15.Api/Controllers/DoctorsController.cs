@@ -16,7 +16,7 @@ public class DoctorController : ControllerBase
     {
         _doctorsData = doctorsData;
     }
-
+   
     [HttpPost]
     public async Task<IActionResult> AddDoctor([FromBody] DoctorModel.Request request)
     {
@@ -42,7 +42,7 @@ public class DoctorController : ControllerBase
         return Ok(doctors);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("doctors/{id}")]
     public async Task<IActionResult> GetDoctorById([FromRoute] Guid id)
     {
         var doctor = await _doctorsData.GetDoctorById(id);
@@ -57,7 +57,7 @@ public class DoctorController : ControllerBase
         return Ok(response);
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("doctors/{id}")]
     public async Task<IActionResult> DeleteDoctor([FromRoute] Guid id)
     {
         var doctor = await _doctorsData.GetDoctorById(id);

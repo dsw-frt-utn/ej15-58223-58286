@@ -15,7 +15,7 @@ namespace Dsw2026Ej15.Domain.Entities
             Name = name;
             Description = description;
         }
-        private Speciality() { }
+        public Speciality() { }
         
         
     }

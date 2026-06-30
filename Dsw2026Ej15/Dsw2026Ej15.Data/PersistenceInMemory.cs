@@ -6,9 +6,9 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-/*
-namespace Dsw2026Ej15.Data;
 
+namespace Dsw2026Ej15.Data;
+/*
 public class PersistenceInMemory : IPersistence
 {
     private List<Speciality> _specialities = [];

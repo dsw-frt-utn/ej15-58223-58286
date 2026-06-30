@@ -19,7 +19,7 @@ public class Doctor: EntityBase
         IsActive = true;
         Speciality = speciality;
     }
-    private Doctor() {} // En teoria es para el arranque del EF
+    public Doctor() {} // En teoria es para el arranque del EF
 
 
     public Doctor(Guid id, string name, string licenseNumber, bool isActive, Speciality speciality): base(id)

@@ -1,4 +1,5 @@
 ﻿using Dsw2026Ej15.Data.Dtos;
+using Dsw2026Ej15.Data.Utils;
 using Dsw2026Ej15.Domain.Entities;
 using Dsw2026Ej15.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -15,8 +16,13 @@ namespace Dsw2026Ej15.Data
         public PersistenceEf(Dsw2026Ej15DbContext context)
         {
             _context = context;
+            InitializeData();
         }
-     
+        public void InitializeData()
+        {
+            _context.Seedwork<Speciality>("specialities");
+            _context.Seedwork<Doctor>("doctors");
+        }
         public async Task AddDoctor(Doctor doctor)
         {
             _context.Add(doctor);
