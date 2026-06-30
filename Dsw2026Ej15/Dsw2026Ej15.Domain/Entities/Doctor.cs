@@ -32,7 +32,7 @@ namespace Dsw2026Ej15.Domain.Entities
 
         }
 
-        private Doctor()
+        public Doctor()
         {
             
         }
