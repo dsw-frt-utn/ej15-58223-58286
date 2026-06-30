@@ -1,6 +1,6 @@
 ﻿using Dsw2026Ej15.Api.Models;
 using Dsw2026Ej15.Domain.Entities;
-using Dsw2026Ej15.Domain.Interfaces;
+using Dsw2026Ej15.Data.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Security;
@@ -27,14 +27,14 @@ public class DoctorsController : AppController
             throw new ValidationException("Nombre y matricula son requeridos");
         }
 
-        var speciality = _persistence.GetSpecialityById(request.SpecialityId);
+        var speciality = await _persistence.GetSpecialityById(request.SpecialityId);
         if(speciality is null)
         {
             throw new ValidationException("La especialidad no existe");
         }
 
         var doctor = new Doctor(request.Name, request.LicenseNumber, speciality);
-        _persistence.SaveDoctor(doctor);
+        _persistence?.SaveDoctor(doctor);
 
         return Created();
 
@@ -43,16 +43,16 @@ public class DoctorsController : AppController
     [HttpGet("doctors")]
     public async Task<IActionResult> GetDoctors()
     {
-
-        return Ok(_persistence.GetDoctors());
+        var doctors = await _persistence.GetDoctors();
+        return Ok(doctors);
 
     }
 
     [HttpGet("doctors/{id}")]
-    public async Task<IActionResult> GetDoctorById(Guid id)
+    public async Task<IActionResult> GetDoctorById([FromRoute]Guid id)
     {
         
-        var doctor = _persistence.GetDoctorById(id);
+        var doctor = await _persistence.GetDoctorById(id);
 
         if (doctor == null || !doctor.IsActive)
         {
@@ -76,14 +76,14 @@ public class DoctorsController : AppController
     [HttpDelete("doctors/{id}")]
     public async Task<IActionResult> DeleteDoctor(Guid id)
     {
-        var doctor = _persistence.GetDoctorById(id);
-        if(!doctor.IsActive || doctor is null)
-        {
-            throw new ValidationException("El doctor debe existir y estar activo");
-        }
-        _persistence.DeleteDoctor(id);
+        var doctor = await _persistence.GetDoctorById(id);
 
-        return NoContent ();
+        if (doctor == null || !doctor.IsActive)
+        {
+            return NotFound();
+        }
+        await _persistence.DeleteDoctor(doctor);
+        return NoContent();
     }
 
 

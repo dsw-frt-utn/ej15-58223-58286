@@ -1,4 +1,4 @@
-﻿using Dsw2026Ej15.Domain.Interfaces;
+﻿using Dsw2026Ej15.Data.Interfaces;
 using Dsw2026Ej15.Domain.Entities;
 using Dsw2026Ej15.Data.Dtos;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Dsw2026Ej15.Data;
 
-public class PersistenceInMemory : IPersistence
+public class PersistenceInMemory 
 {
     private List<Speciality> _specialities = [];
     private List<Doctor> _doctors = [];
