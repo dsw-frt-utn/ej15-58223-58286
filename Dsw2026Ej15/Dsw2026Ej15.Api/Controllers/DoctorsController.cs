@@ -1,90 +1,72 @@
 ﻿using Dsw2026Ej15.Api.Models;
 using Dsw2026Ej15.Domain.Entities;
+using Dsw2026Ej15.Domain.Exceptions;
 using Dsw2026Ej15.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
-using System.Security;
-using System.Xml.Linq;
-using ValidationException = Dsw2026Ej15.Domain.Exceptions.ValidationException;
 
 namespace Dsw2026Ej15.Api.Controllers;
 
-public class DoctorsController : AppController
+[ApiController]
+[Route("api/doctors")]
+public class DoctorController : ControllerBase
 {
-    private IPersistence _persistence;
+    private readonly IPersistence _doctorsData;
 
-    public DoctorsController(IPersistence persistence)
+    public DoctorController(IPersistence doctorsData)
     {
-        _persistence = persistence;
+        _doctorsData = doctorsData;
     }
 
-
-    [HttpPost("doctors")]
-    public async Task<IActionResult> CreateDoctor(DoctorModel.Request request)
+    [HttpPost]
+    public async Task<IActionResult> AddDoctor([FromBody] DoctorModel.Request request)
     {
-        if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.LicenseNumber))
+        var speciality = await _doctorsData.GetSpecialityById(request.SpecialityId);
+
+        if (string.IsNullOrWhiteSpace(request.Name) ||
+        string.IsNullOrWhiteSpace(request.LicenseNumber))
         {
-            throw new ValidationException("Nombre y matricula son requeridos");
+            throw new ValidationException("No se permiten campos vacíos");
         }
+        if (speciality is null) throw new ValidationException("No existe la especialidad indicada");
 
-        var speciality = _persistence.GetSpecialityById(request.SpecialityId);
-        if(speciality is null)
-        {
-            throw new ValidationException("La especialidad no existe");
-        }
+        var newDoctor = new Doctor(request.Name, request.LicenseNumber, speciality);
 
-        var doctor = new Doctor(request.Name, request.LicenseNumber, speciality);
-        _persistence.SaveDoctor(doctor);
-
+        await _doctorsData.AddDoctor(newDoctor);
         return Created();
-
     }
 
-    [HttpGet("doctors")]
-    public async Task<IActionResult> GetDoctors()
+    [HttpGet]
+    public async Task<IActionResult> GetActiveDoctors()
     {
-
-        return Ok(_persistence.GetDoctors());
-
+        var doctors = await _doctorsData.GetActiveDoctors();
+        return Ok(doctors);
     }
 
-    [HttpGet("doctors/{id}")]
-    public async Task<IActionResult> GetDoctorById(Guid id)
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetDoctorById([FromRoute] Guid id)
     {
-        
-        var doctor = _persistence.GetDoctorById(id);
+        var doctor = await _doctorsData.GetDoctorById(id);
 
-        if (doctor == null || !doctor.IsActive)
+        if (doctor == null)
         {
-            throw new ValidationException("No se encontro un doctor");
+            return NotFound("El ID ingresado no corresponde a un doctor registrado/activo.");
         }
 
-        
-
-
-        var response = new DoctorModel.Response
-        (
-           doctor.Name,
-           doctor.LicenseNumber,
-           doctor.Speciality?.Name
-        );
+        var response = new DoctorModel.Response(doctor.Name, doctor.LicenseNumber, doctor.Speciality.Name);
 
         return Ok(response);
     }
 
-
-    [HttpDelete("doctors/{id}")]
-    public async Task<IActionResult> DeleteDoctor(Guid id)
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteDoctor([FromRoute] Guid id)
     {
-        var doctor = _persistence.GetDoctorById(id);
-        if(!doctor.IsActive || doctor is null)
+        var doctor = await _doctorsData.GetDoctorById(id);
+
+        if (doctor == null || !doctor.IsActive)
         {
-            throw new ValidationException("El doctor debe existir y estar activo");
+            return NotFound();
         }
-        _persistence.DeleteDoctor(id);
-
-        return NoContent ();
+        await _doctorsData.RemoveDoctor(doctor);
+        return NoContent();
     }
-
-
 }

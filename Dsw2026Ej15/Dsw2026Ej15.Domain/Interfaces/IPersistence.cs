@@ -5,11 +5,11 @@ namespace Dsw2026Ej15.Domain.Interfaces;
 
 public interface IPersistence
 {
-    Speciality? GetSpecialityById(Guid id);
-    void SaveDoctor(Doctor doctor);
-    IEnumerable<Doctor> GetDoctors();
-    Doctor GetDoctorById(Guid id);
-    void DeleteDoctor(Guid id);
+    Task<List<Doctor>?> GetActiveDoctors();
+    Task<Doctor?> GetDoctorById(Guid id);
+    Task<Speciality?> GetSpecialityById(Guid id);
+    Task AddDoctor(Doctor doctor);
+    Task RemoveDoctor(Doctor doctor);
 
-    // Aquí luego agregaremos los métodos para insertar, buscar o eliminar médicos
+
 }
