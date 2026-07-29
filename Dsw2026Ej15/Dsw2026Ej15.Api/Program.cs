@@ -1,6 +1,8 @@
 
+using Dsw2026Ej15.Api.Middleware;
 using Dsw2026Ej15.Data;
 using Dsw2026Ej15.Domain.Interfaces;
+using System.Runtime.ExceptionServices;
 
 namespace Dsw2026Ej15.Api
 {
@@ -19,14 +21,14 @@ namespace Dsw2026Ej15.Api
 
 
             var app = builder.Build();
-
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            
             app.UseHttpsRedirection();
 
             app.UseAuthorization();

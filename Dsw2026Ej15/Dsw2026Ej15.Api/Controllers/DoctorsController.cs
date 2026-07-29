@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Security;
 using System.Xml.Linq;
 using ValidationException = Dsw2026Ej15.Domain.Exceptions.ValidationException;
+using NotFoundException = Dsw2026Ej15.Domain.Exceptions.NotFoundException;
 
 namespace Dsw2026Ej15.Api.Controllers;
 
@@ -56,11 +57,8 @@ public class DoctorsController : AppController
 
         if (doctor == null || !doctor.IsActive)
         {
-            throw new ValidationException("No se encontro un doctor");
+            throw new NotFoundException("No se encontro un doctor");
         }
-
-        
-
 
         var response = new DoctorModel.Response
         (
@@ -79,11 +77,11 @@ public class DoctorsController : AppController
         var doctor = _persistence.GetDoctorById(id);
         if(!doctor.IsActive || doctor is null)
         {
-            throw new ValidationException("El doctor debe existir y estar activo");
+            throw new NotFoundException("El doctor debe existir y estar activo");
         }
         _persistence.DeleteDoctor(id);
 
-        return NoContent ();
+        return NoContent();
     }
 
 
