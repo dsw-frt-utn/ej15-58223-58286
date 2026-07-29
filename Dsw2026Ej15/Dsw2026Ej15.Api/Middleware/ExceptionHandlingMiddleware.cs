@@ -28,11 +28,16 @@ public class ExceptionHandlingMiddleware
     private async Task HandleExceptionAsync(HttpContext context, Exception ex)
     {
         HttpStatusCode status = HttpStatusCode.InternalServerError;
-        string message = "Ocurrió un error inesperado al ejecutar la solicitud";
+        string message = ex.Message;
         if(ex is ValidationException ve)
         {
             status = HttpStatusCode.BadRequest;
             message = ve.Message;
+        }
+        if(ex is NotFoundException nfe)
+        {
+            status = HttpStatusCode.NotFound;
+            message = nfe.Message;
         }
         var result = JsonSerializer.Serialize(new { error = message });
         context.Response.ContentType = "application/json";

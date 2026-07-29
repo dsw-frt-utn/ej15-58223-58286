@@ -3,6 +3,8 @@ using Dsw2026Ej15.Domain.Entities;
 using Dsw2026Ej15.Domain.Exceptions;
 using Dsw2026Ej15.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using ValidationException = Dsw2026Ej15.Domain.Exceptions.ValidationException;
+using NotFoundException = Dsw2026Ej15.Domain.Exceptions.NotFoundException;
 
 namespace Dsw2026Ej15.Api.Controllers;
 
@@ -10,17 +12,17 @@ namespace Dsw2026Ej15.Api.Controllers;
 [Route("api/doctors")]
 public class DoctorController : ControllerBase
 {
-    private readonly IPersistence _doctorsData;
+    private readonly IPersistence _persistenceDoctores;
 
     public DoctorController(IPersistence doctorsData)
     {
-        _doctorsData = doctorsData;
+        _persistenceDoctores = doctorsData;
     }
    
     [HttpPost]
     public async Task<IActionResult> AddDoctor([FromBody] DoctorModel.Request request)
     {
-        var speciality = await _doctorsData.GetSpecialityById(request.SpecialityId);
+        var speciality = await _persistenceDoctores.GetSpecialityById(request.SpecialityId);
 
         if (string.IsNullOrWhiteSpace(request.Name) ||
         string.IsNullOrWhiteSpace(request.LicenseNumber))
@@ -31,28 +33,34 @@ public class DoctorController : ControllerBase
 
         var newDoctor = new Doctor(request.Name, request.LicenseNumber, speciality);
 
-        await _doctorsData.AddDoctor(newDoctor);
+        await _persistenceDoctores.AddDoctor(newDoctor);
         return Created();
     }
 
     [HttpGet]
     public async Task<IActionResult> GetActiveDoctors()
     {
-        var doctors = await _doctorsData.GetActiveDoctors();
+        var doctors = await _persistenceDoctores.GetActiveDoctors();
         return Ok(doctors);
     }
 
     [HttpGet("doctors/{id}")]
     public async Task<IActionResult> GetDoctorById([FromRoute] Guid id)
     {
-        var doctor = await _doctorsData.GetDoctorById(id);
+        var doctor = await _persistenceDoctores.GetDoctorById(id);
 
         if (doctor == null)
         {
-            return NotFound("El ID ingresado no corresponde a un doctor registrado/activo.");
+
+            throw new NotFoundException("No se encontro un doctor");
         }
 
-        var response = new DoctorModel.Response(doctor.Name, doctor.LicenseNumber, doctor.Speciality.Name);
+        var response = new DoctorModel.Response
+        (
+           doctor.Name,
+           doctor.LicenseNumber,
+           doctor.Speciality?.Name
+        );
 
         return Ok(response);
     }
@@ -60,13 +68,14 @@ public class DoctorController : ControllerBase
     [HttpDelete("doctors/{id}")]
     public async Task<IActionResult> DeleteDoctor([FromRoute] Guid id)
     {
-        var doctor = await _doctorsData.GetDoctorById(id);
+        var doctor = await _persistenceDoctores.GetDoctorById(id);
 
         if (doctor == null || !doctor.IsActive)
         {
-            return NotFound();
+            throw new NotFoundException("El doctor debe existir y estar activo");
         }
-        await _doctorsData.RemoveDoctor(doctor);
+        _persistenceDoctores.RemoveDoctor(doctor);
+
         return NoContent();
     }
 }
