@@ -28,7 +28,7 @@ public class ExceptionHandlingMiddleware
     private async Task HandleExceptionAsync(HttpContext context, Exception ex)
     {
         HttpStatusCode status = HttpStatusCode.InternalServerError;
-        string message = "Ocurrió un error inesperado al ejecutar la solicitud";
+        string message = ex.Message;
         if(ex is ValidationException ve)
         {
             status = HttpStatusCode.BadRequest;
