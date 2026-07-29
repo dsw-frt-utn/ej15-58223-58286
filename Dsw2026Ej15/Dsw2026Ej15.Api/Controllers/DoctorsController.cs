@@ -5,6 +5,7 @@ using Dsw2026Ej15.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using ValidationException = Dsw2026Ej15.Domain.Exceptions.ValidationException;
 using NotFoundException = Dsw2026Ej15.Domain.Exceptions.NotFoundException;
+using System.Xml.Linq;
 
 namespace Dsw2026Ej15.Api.Controllers;
 
@@ -41,7 +42,16 @@ public class DoctorController : ControllerBase
     public async Task<IActionResult> GetActiveDoctors()
     {
         var doctors = await _persistenceDoctores.GetActiveDoctors();
-        return Ok(doctors);
+
+        var doctoresListados = new List<DoctorModel.Response>();
+
+        foreach (Doctor doctor  in doctors)
+        {
+            var doctormodel = new DoctorModel.Response(doctor.Id,doctor.Name,doctor.LicenseNumber, doctor.Speciality?.Name , doctor.Speciality.Description, doctor.Speciality.Id);
+            doctoresListados.Add(doctormodel);
+        }
+
+        return Ok(doctoresListados);
     }
 
     [HttpGet("doctors/{id}")]
@@ -57,9 +67,12 @@ public class DoctorController : ControllerBase
 
         var response = new DoctorModel.Response
         (
+           doctor.Id,
            doctor.Name,
            doctor.LicenseNumber,
-           doctor.Speciality?.Name
+           doctor.Speciality?.Name,
+           doctor.Speciality.Description,
+           doctor.Speciality.Id
         );
 
         return Ok(response);

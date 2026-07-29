@@ -9,8 +9,8 @@ public class Doctor: EntityBase
     public string Name { get; init; }
     public string LicenseNumber { get; init; }
     public bool IsActive { get;  set; }
-    public Guid? SpecialityId { get; private set; }
-    public Speciality? Speciality { get; private set; }
+    public Guid? SpecialityId { get; init; }
+    public Speciality? Speciality { get; init; }
 
     public Doctor(string name, string licenseNumber, Speciality speciality, Guid? id = null) : base(id)
     {

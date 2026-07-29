@@ -7,12 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Sources\**" />
-    <EmbeddedResource Remove="Sources\**" />
-    <None Remove="Sources\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Dsw2026Ej15.Domain\Dsw2026Ej15.Domain.csproj" />
   </ItemGroup>
 
@@ -31,6 +25,10 @@
     <None Update="Sources\specialities.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Sources\" />
   </ItemGroup>
 
 </Project>
